@@ -1,0 +1,27 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="Albums.ManterAlbumPage" Title="Adicionar Album">
+    <ContentPage.Content>
+        <StackLayout Orientation="Vertical">
+            <Frame Padding="50,50,50,50" HasShadow="true" BackgroundColor="#80000000" Grid.Row="0" Grid.Column="0" IsVisible="{Binding IsLoading}" VerticalOptions="Center" HorizontalOptions="Center">
+                <ActivityIndicator Color="White" VerticalOptions="Center" HorizontalOptions="Center" x:Name="actInd" IsRunning="{Binding IsLoading}" IsVisible="{Binding IsLoading}" />
+            </Frame>
+            <TableView Intent="Form">
+                <TableRoot>
+                    <TableSection>
+                        <EntryCell  
+                                Placeholder="Digite aqui o titulo" 
+                                Text="{Binding Nome}" 
+                                HorizontalTextAlignment="Start" ></EntryCell>
+                    </TableSection>
+                </TableRoot>
+            </TableView>
+            <StackLayout VerticalOptions="EndAndExpand" Orientation="Horizontal">
+                <ImageButton HorizontalOptions="Start" Source="icone_send.png" BackgroundColor="Transparent" Command="{Binding EnviarAlbumCommand}"></ImageButton>
+                <ImageButton HorizontalOptions="Start" Source="icone_limpar.png" BackgroundColor="Transparent" Command="{Binding LimparCamposCommand}"></ImageButton>
+                <ImageButton HorizontalOptions="Start" Source="icone_voltar.png" BackgroundColor="Transparent" Command="{Binding VoltarTelaInicialCommand}"></ImageButton>
+            </StackLayout>
+        </StackLayout>
+    </ContentPage.Content>
+</ContentPage>

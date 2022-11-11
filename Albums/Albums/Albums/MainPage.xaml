@@ -1,24 +1,63 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-             x:Class="Albums.MainPage">
+             x:Class="Albums.MainPage" Title="Pastas">
+    <StackLayout Orientation="Vertical">
+        <StackLayout>
+            <RefreshView IsRefreshing="{Binding IsRefreshing}"
+                         RefreshColor="Teal"
+                         Command="{Binding RefreshCommand}">
+                <ScrollView>
+                    <CollectionView ItemsSource="{Binding Items}" 
+                                    x:Name="Lista" 
+                                    HorizontalOptions="FillAndExpand" >
+                        <CollectionView.ItemTemplate>
+                            <DataTemplate>
+                                <Grid  x:Name="linha">
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="Auto" />
+                                    </Grid.RowDefinitions>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="Auto" />
+                                        <ColumnDefinition Width="Auto" />
+                                        <ColumnDefinition Width="Auto" />
+                                    </Grid.ColumnDefinitions>
 
-    <StackLayout>
-        <Frame BackgroundColor="#2196F3" Padding="24" CornerRadius="0">
-            <Label Text="Welcome to Xamarin.Forms!" HorizontalTextAlignment="Center" TextColor="White" FontSize="36"/>
-        </Frame>
-        <Label Text="Start developing now" FontSize="Title" Padding="30,10,30,10"/>
-        <Label Text="Make changes to your XAML file and save to see your UI update in the running app with XAML Hot Reload. Give it a try!" FontSize="16" Padding="30,0,30,0"/>
-        <Label FontSize="16" Padding="30,24,30,0">
-            <Label.FormattedText>
-                <FormattedString>
-                    <FormattedString.Spans>
-                        <Span Text="Learn more at "/>
-                        <Span Text="https://aka.ms/xamarin-quickstart" FontAttributes="Bold"/>
-                    </FormattedString.Spans>
-                </FormattedString>
-            </Label.FormattedText>
-        </Label>
+                                    <Label Text="{Binding Nome}" 
+                                           Grid.Column="0"
+                                           HorizontalTextAlignment="Start" TextColor="Black" FontSize="Title"></Label>
+
+                                    <ImageButton 
+                                        Source="icone_trash.png" 
+                                        Grid.Column="1"
+                                        Command="{Binding DeletarAlbumCommand}"                                
+                                        BindingContext="{Binding Source={x:Reference Lista}, Path=BindingContext}"                                
+                                        CommandParameter="{Binding Source={x:Reference linha}, Path=BindingContext}"                                 
+                                        HorizontalOptions="End"  
+                                        VerticalOptions="FillAndExpand" BackgroundColor="Transparent"></ImageButton>
+
+                                    <ImageButton 
+                                        Source="icone_edit.png" 
+                                        Grid.Column="2"
+                                        Command="{Binding EditarAlbumCommand}"                                
+                                        BindingContext="{Binding Source={x:Reference Lista}, Path=BindingContext}"                                
+                                        CommandParameter="{Binding Source={x:Reference linha}, Path=BindingContext}"                                 
+                                        HorizontalOptions="End"  
+                                        VerticalOptions="FillAndExpand" BackgroundColor="Transparent"></ImageButton>
+                                </Grid>
+                            </DataTemplate>
+                        </CollectionView.ItemTemplate>
+                    </CollectionView>
+                </ScrollView>
+            </RefreshView>
+        </StackLayout>
+        <StackLayout  VerticalOptions="EndAndExpand" HorizontalOptions="EndAndExpand" Orientation="Horizontal" Margin="0, 0, 20, 10">
+            <ImageButton 
+                    Source="icone_pasta.png" 
+                    Command="{Binding AdicionarAlbumCommand}"  
+                    CornerRadius="10" BackgroundColor="Transparent"                               
+                 >
+            </ImageButton>
+        </StackLayout>
     </StackLayout>
-
 </ContentPage>
