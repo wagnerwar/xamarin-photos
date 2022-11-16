@@ -4,6 +4,8 @@ using System.IO;
 using System.Text;
 using Microsoft.Data.Sqlite;
 using Albums.Model;
+using System.Threading.Tasks;
+
 namespace Albums.Service
 {
     public class BancoSQLiteService
@@ -33,6 +35,14 @@ namespace Albums.Service
                     CREATE TABLE IF NOT EXISTS album (
                         id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
                         nome varchar(100) NOT NULL
+                    );
+
+                    CREATE TABLE IF NOT EXISTS foto (
+                        id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+                        nome varchar(100) NOT NULL,
+                        id_album integer not null,
+                        arquivo blob,
+                        FOREIGN KEY(id_album) REFERENCES album(id)
                     )
                 ";
                     command.ExecuteNonQuery();
@@ -163,7 +173,8 @@ namespace Albums.Service
                             var command = conexao.CreateCommand();
                             command.CommandText =
                             String.Format(@"
-                            delete from album where id = '{1}'
+                            delete from foto where id_album = '{0}';
+                            delete from album where id = '{0}'
                             ", album.Id);
                             command.ExecuteNonQuery();
                             transaction.Commit();
@@ -187,7 +198,15 @@ namespace Albums.Service
         }
         public List<AlbumModel> RecuperarAlbums()
         {
-            
+            try
+            {
+                this.CriarBanco();
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+
             List<AlbumModel> lista = new List<AlbumModel>();
             using (var conexao = new SqliteConnection(DatabasePath))
             {
@@ -210,6 +229,150 @@ namespace Albums.Service
                         }
                     }
                     return lista;
+                }
+                catch (Exception ex)
+                {
+                    throw ex;
+                }
+                finally
+                {
+                    conexao.Close();
+                }
+            }
+        }
+        public void InserirFoto(FotoModel foto, AlbumModel album)
+        {
+            try
+            {
+                this.CriarBanco();
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+
+            using (var conexao = new SqliteConnection(DatabasePath))
+            {
+                conexao.Open();
+                try
+                {
+                    using (var transaction = conexao.BeginTransaction())
+                    {
+                        try
+                        {
+
+                            var command = conexao.CreateCommand();
+                            command.CommandText =
+                            String.Format(@"
+                            insert into foto (nome, id_album, arquivo ) values('{0}', '{1}', @pic)
+                            ", foto.Nome, album.Id);
+                            command.Parameters.Add("@pic", SqliteType.Blob);
+                            command.Parameters[0].Value = foto.Arquivo;
+                            command.ExecuteNonQuery();
+                            transaction.Commit();
+                        }
+                        catch (Exception ex)
+                        {
+                            transaction.Rollback();
+                            throw ex;
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    throw ex;
+                }
+                finally
+                {
+                    conexao.Close();
+                }
+            }
+        }
+        public async Task<List<FotoModel>> RecuperarFotos(AlbumModel album)
+        {
+            try
+            {
+                this.CriarBanco();
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+
+            List<FotoModel> lista = new List<FotoModel>();
+            using (var conexao = new SqliteConnection(DatabasePath))
+            {
+                conexao.Open();
+                try
+                {
+                    var command = conexao.CreateCommand();
+                    command.CommandText =
+                    String.Format(@"
+                        select id, nome, arquivo from foto where id_album = '{0}'
+                    ", album.Id);
+                    using (var reader = command.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            FotoModel item = new FotoModel();
+                            item.Id = reader.GetInt32(0);
+                            item.Nome = reader.GetString(1);                            
+                            MemoryStream outputStream = new MemoryStream();
+                            using (var readStream = reader.GetStream(2))
+                            {
+                                await readStream.CopyToAsync(outputStream);
+                            }
+                            item.Arquivo = outputStream.ToArray();
+                            lista.Add(item);
+                        }
+                    }
+                    return lista;
+                }
+                catch (Exception ex)
+                {
+                    throw ex;
+                }
+                finally
+                {
+                    conexao.Close();
+                }
+            }
+        }
+        public async Task ExcluirFoto(FotoModel foto)
+        {
+            try
+            {
+                this.CriarBanco();
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+
+            using (var conexao = new SqliteConnection(DatabasePath))
+            {
+                conexao.Open();
+                try
+                {
+                    using (var transaction = conexao.BeginTransaction())
+                    {
+                        try
+                        {
+
+                            var command = conexao.CreateCommand();
+                            command.CommandText =
+                            String.Format(@"
+                            delete from foto where id = '{0}'
+                            ", foto.Id);
+                            command.ExecuteNonQuery();
+                            transaction.Commit();
+                        }
+                        catch (Exception ex)
+                        {
+                            transaction.Rollback();
+                            throw ex;
+                        }
+                    }
                 }
                 catch (Exception ex)
                 {

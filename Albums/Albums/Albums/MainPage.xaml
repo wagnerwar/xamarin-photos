@@ -21,6 +21,7 @@
                                         <ColumnDefinition Width="Auto" />
                                         <ColumnDefinition Width="Auto" />
                                         <ColumnDefinition Width="Auto" />
+                                        <ColumnDefinition Width="Auto" />
                                     </Grid.ColumnDefinitions>
 
                                     <Label Text="{Binding Nome}" 
@@ -40,6 +41,15 @@
                                         Source="icone_edit.png" 
                                         Grid.Column="2"
                                         Command="{Binding EditarAlbumCommand}"                                
+                                        BindingContext="{Binding Source={x:Reference Lista}, Path=BindingContext}"                                
+                                        CommandParameter="{Binding Source={x:Reference linha}, Path=BindingContext}"                                 
+                                        HorizontalOptions="End"  
+                                        VerticalOptions="FillAndExpand" BackgroundColor="Transparent"></ImageButton>
+
+                                    <ImageButton 
+                                        Source="icone_foto.png" 
+                                        Grid.Column="3"
+                                        Command="{Binding AdicionarFotoCommand}"                                
                                         BindingContext="{Binding Source={x:Reference Lista}, Path=BindingContext}"                                
                                         CommandParameter="{Binding Source={x:Reference linha}, Path=BindingContext}"                                 
                                         HorizontalOptions="End"  

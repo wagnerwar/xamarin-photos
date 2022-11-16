@@ -19,6 +19,7 @@ namespace Albums.ViewModel
         public ICommand AdicionarAlbumCommand { get; set; }
         public ICommand DeletarAlbumCommand { get; set; }
         public ICommand RefreshCommand { get; set; }
+        public ICommand AdicionarFotoCommand { get; set; }
         private ObservableCollection<AlbumModel> items;
         public ObservableCollection<AlbumModel> Items
         {
@@ -41,15 +42,28 @@ namespace Albums.ViewModel
         }
         public AlbumViewModel(INavigation navigation)
         {
+            _service = new BancoSQLiteService();
             _navigation = navigation;
             AdicionarAlbumCommand = new Command(async () => await AdicionarAlbum());
             CarregarAlbumsCommand = new Command(async () => await CarregarAlbums());
             EditarAlbumCommand = new Command<AlbumModel>(async (a) => await EditarAlbum(a));
             RefreshCommand = new Command(async () => await RefreshItemsAsync());
             DeletarAlbumCommand = new Command<AlbumModel>(async (a) => await DeletarAlbum(a));
+            AdicionarFotoCommand = new Command<AlbumModel>(async (a) => await AdicionarFoto(a));
             Items = new ObservableCollection<AlbumModel>();
             var t = Task.Run(() => this.CarregarAlbums());
             t.Wait();
+        }
+        private async Task AdicionarFoto(AlbumModel album)
+        {
+            try
+            {
+                await _navigation.PushAsync(new FotoPage(album), true);
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
         }
         private async Task AdicionarAlbum()
         {
